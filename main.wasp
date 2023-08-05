@@ -38,20 +38,14 @@ entity User {=psl
 psl=}
 
 entity Image {=psl
-    id         Int    @id @default(autoincrement())
-    url        String
-    resolution String
-    user       User   @relation(fields: [userId], references: [id])
-    userId     Int
+    id     Int    @id @default(autoincrement())
+    path   String
+    userId Int
+    user   User   @relation(fields: [userId], references: [id])
 psl=}
 
 action uploadImage {
   fn: import { uploadImage } from "@server/actions.js",
-  entities: [User, Image]
-}
-
-action upscaleImage {
-  fn: import { upscaleImage } from "@server/actions.js",
   entities: [User, Image]
 }
 
@@ -60,25 +54,8 @@ query getUserImages {
   entities: [User, Image]
 }
 
-query getImage {
-  fn: import { getImage } from "@server/queries.js",
-  entities: [Image]
-}
-
-route ImageUploadRoute { path: "/upload", to: ImageUploadPage }
-page ImageUploadPage {
-  component: import { ImageUploadPage } from "@client/pages/ImageUploadPage.jsx",
-  authRequired: true
-}
-
-route ImageUpscaleRoute { path: "/upscale/:imageId", to: ImageUpscalePage }
-page ImageUpscalePage {
-  component: import { ImageUpscalePage } from "@client/pages/ImageUpscalePage.jsx",
-  authRequired: true
-}
-
 route DashboardRoute { path: "/", to: DashboardPage }
 page DashboardPage {
-  authRequired: true,
-  component: import Dashboard from "@client/pages/Dashboard.jsx"
+  component: import { Dashboard } from "@client/pages/Dashboard.jsx",
+  authRequired: true
 }

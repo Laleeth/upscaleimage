@@ -1,38 +1,13 @@
 import HttpError from '@wasp/core/HttpError.js'
 
-export const getUserImages = async ({ userId }, context) => {
-  const user = await context.entities.User.findUnique({
-    where: { id: userId }
-  });
+export const getUserImages = async (args, context) => {
+  if (!context.user) { throw new HttpError(401) }
 
-  if (!user) throw new HttpError(404, 'No user with id ' + userId);
-
-  return context.entities.Image.findMany({
+  const images = await context.entities.Image.findMany({
     where: {
-      user: { id: userId }
+      userId: context.user.id
     }
   });
-}
 
-export const getImage = async (args, context) => {
-  const { id } = args;
-
-  if (!context.user) {
-    throw new HttpError(401);
-  }
-
-  const image = await context.entities.Image.findUnique({
-    where: { id },
-    select: { userId: true }
-  });
-
-  if (!image) {
-    throw new HttpError(404);
-  }
-
-  if (image.userId !== context.user.id) {
-    throw new HttpError(400);
-  }
-
-  return image;
+  return images;
 }
